@@ -15,8 +15,10 @@ from scipy.spatial.transform import Rotation as Rot
 import matplotlib.pyplot as plt
 import numpy as np
 
-# from utils.angle import rot_mat_2d
+from KLD_sampling import KLDSampling
+sampler = KLDSampling(quantile=0.5, err = 0.1, bsz = [0.1,0.1], sample_min=10, num_particles=100)
 
+# from utils.angle import rot_mat_2d
 def rot_mat_2d(angle):
     """
     Create 2D rotation matrix from an angle
@@ -126,6 +128,16 @@ def calc_covariance(x_est, px, pw):
 
     return cov
 
+# Add KLD sampling
+def adaptive_resampling(px, pw, sampler):
+    """
+    Adaptive resampling using KLD Sampling
+    """
+    new_particles, new_weights = sampler.resample(px, pw)
+    num_particles = new_particles.shape[1]
+
+    return new_particles, new_weights, num_particles
+
 
 def pf_localization(px, pw, z, u):
     """
@@ -160,7 +172,7 @@ def pf_localization(px, pw, z, u):
 
     N_eff = 1.0 / (pw.dot(pw.T))[0, 0]  # Effective particle number
     if N_eff < NTh:
-        px, pw = re_sampling(px, pw)
+        px, pw, num_particles = adaptive_resampling(px, pw, sampler)
     return x_est, p_est, px, pw
 
 
