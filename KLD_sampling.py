@@ -254,4 +254,4 @@ def test2d(quantile=0.5, kld_error = 0.1, bin_size = [0.1,0.1], min_samples=10, 
 
 if __name__ == '__main__':
   test1d ()
-  # test2d ()
+  test2d ()
