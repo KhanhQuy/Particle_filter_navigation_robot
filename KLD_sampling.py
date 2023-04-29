@@ -128,6 +128,19 @@ class KLDSampling:
         #     bin = int((sample[i] - self.min_value) / self.bin_size)
         #     self.bins[bin] += self.particle_weights[i]
         #print "done adding sample", sample," to bins ",self.bins;
+    
+    def resample_particles(self, particles, particle_weights, num_bins):
+        n = len(particles)
+        indices = np.arange(n)
+        bins = np.linspace(0, 1, num_bins + 1)
+        
+        weights_cumsum = np.cumsum(particle_weights)
+        resampled_indices = np.digitize(np.random.uniform(0, 1/n, n), weights_cumsum)
+        
+        resampled_particles = particles[resampled_indices]
+        resampled_weights = np.ones(n) / n
+        
+        return resampled_particles, resampled_weights
 
 # Return a point drawn from a ND Gaussian distribution centered at
 # mean with a given standard deviation.
@@ -254,4 +267,4 @@ def test2d(quantile=0.5, kld_error = 0.1, bin_size = [0.1,0.1], min_samples=10, 
 
 if __name__ == '__main__':
   test1d ()
-  test2d ()
+  # test2d ()

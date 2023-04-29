@@ -18,6 +18,8 @@ import numpy as np
 from KLD_sampling import KLDSampling
 sampler = KLDSampling(quantile=0.5, err = 0.1, bsz = [0.1,0.1], sample_min=10, num_particles=100)
 
+# print(sampler)
+# breakpoint
 # from utils.angle import rot_mat_2d
 def rot_mat_2d(angle):
     """
@@ -129,14 +131,17 @@ def calc_covariance(x_est, px, pw):
     return cov
 
 # Add KLD sampling
-def adaptive_resampling(px, pw, sampler):
-    """
-    Adaptive resampling using KLD Sampling
-    """
-    new_particles, new_weights = sampler.resample(px, pw)
-    num_particles = new_particles.shape[1]
+def adaptive_resampling(quantile, err, bsz, sample_min, num_particles, particles, particle_weights):
+    # Create an instance of the KLDSampling class
+    kld_sampling = KLDSampling(quantile=0.5, err = 0.1, bsz = [0.1,0.1], sample_min=10, num_particles=100)
 
-    return new_particles, new_weights, num_particles
+    # Determine the number of bins for resampling
+    num_bins = kld_sampling.add_to_bins(particle_weights)
+
+    # Resample particles based on their weights
+    resampled_particles, resampled_weights = kld_sampling.resample_particles(particles, particle_weights, num_bins)
+
+    return resampled_particles, resampled_weights
 
 
 def pf_localization(px, pw, z, u):
@@ -172,7 +177,10 @@ def pf_localization(px, pw, z, u):
 
     N_eff = 1.0 / (pw.dot(pw.T))[0, 0]  # Effective particle number
     if N_eff < NTh:
-        px, pw, num_particles = adaptive_resampling(px, pw, sampler)
+        # px, pw = re_sampling(px, pw)
+        # px, pw = adaptive_resampling(px, pw)
+        px, pw = adaptive_resampling(quantile=0.5, err = 0.1, bsz = [0.1,0.1], sample_min=10, num_particles=100, px, pw)
+        # px, pw = sampler
     return x_est, p_est, px, pw
 
 
