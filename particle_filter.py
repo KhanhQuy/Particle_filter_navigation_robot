@@ -2,7 +2,7 @@
 
 Particle Filter localization sample
 
-author: Atsushi Sakai (@Atsushi_twi)
+author: Khanh Ngoc Quy Vuong 
 
 """
 import sys
