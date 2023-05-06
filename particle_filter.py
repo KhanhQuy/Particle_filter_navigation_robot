@@ -5,6 +5,7 @@ Particle Filter localization sample
 author: Khanh Ngoc Quy Vuong 
 
 """
+import random
 import sys
 import pathlib
 sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
@@ -16,11 +17,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from KLD_sampling import KLDSampling
-sampler = KLDSampling(quantile=0.5, err = 0.1, bsz = [0.1,0.1], sample_min=10, num_particles=100)
 
 # print(sampler)
 # breakpoint
 # from utils.angle import rot_mat_2d
+def get_sample(mean, std) :
+    if isinstance(mean,list) and isinstance(std,list):
+        assert len(mean)==len(std);
+        return [get_sample(mean[i],std[i]) for i in range(len(mean))];
+    else:
+        return random.gauss(mean,std)
+    
 def rot_mat_2d(angle):
     """
     Create 2D rotation matrix from an angle
@@ -177,10 +184,30 @@ def pf_localization(px, pw, z, u):
 
     N_eff = 1.0 / (pw.dot(pw.T))[0, 0]  # Effective particle number
     if N_eff < NTh:
+        px, pw = re_sampling(px, pw)
+
+        ### My code
+        # px, pw = adaptive_resampling(quantile=0.5, err = 0.1, bsz = [0.1,0.1], sample_min=10, num_particles=100, px, pw)
+        # sampler = KLDSampling(quantile=0.5, err = 0.1, bsz = [0.1,0.1], sample_min=10, num_particles=100)
+
+        # # num_samples=px;
+        # samples = [];
+        # umean=0
+        # uvar=1
+        # min_samples=10
+
+        # while (px < min_samples) :
+        #     curr_sample = [[get_sample(umean,math.sqrt(uvar))]];
+
+        #     samples.append(curr_sample);
+        #     px = px+1;
+
+        #     #make the sample into a 1D vector because the kld_sampling module
+        #     #assumes multivariate distributions.
+        #     #curr_sample2[0]=curr_sample;
+
+        #     min_samples=sampler.update(curr_sample)
         # px, pw = re_sampling(px, pw)
-        # px, pw = adaptive_resampling(px, pw)
-        px, pw = adaptive_resampling(quantile=0.5, err = 0.1, bsz = [0.1,0.1], sample_min=10, num_particles=100, px, pw)
-        # px, pw = sampler
     return x_est, p_est, px, pw
 
 
