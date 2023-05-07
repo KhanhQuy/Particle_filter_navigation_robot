@@ -138,17 +138,17 @@ def calc_covariance(x_est, px, pw):
     return cov
 
 # Add KLD sampling
-# def adaptive_resampling(quantile, err, bsz, sample_min, num_particles, particles, particle_weights):
-#     # Create an instance of the KLDSampling class
-#     kld_sampling = KLDSampling(quantile=0.5, err = 0.1, bsz = [0.1,0.1], sample_min=10, num_particles=100)
+def adaptive_resampling(quantile, err, bsz, sample_min, num_particles, particles, particle_weights):
+    # Create an instance of the KLDSampling class
+    kld_sampling = KLDSampling(quantile=0.5, err = 0.1, bsz = [0.1,0.1], sample_min=10, num_particles=100)
 
-#     # Determine the number of bins for resampling
-#     num_bins = kld_sampling.add_to_bins(particle_weights)
+    # Determine the number of bins for resampling
+    num_bins = kld_sampling.add_to_bins(particle_weights)
 
-#     # Resample particles based on their weights
-#     resampled_particles, resampled_weights = kld_sampling.resample_particles(particles, particle_weights, num_bins)
+    # Resample particles based on their weights
+    resampled_particles, resampled_weights = kld_sampling.resample_particles(particles, particle_weights, num_bins)
 
-#     return resampled_particles, resampled_weights
+    return resampled_particles, resampled_weights
 
 
 def pf_localization(px, pw, z, u):
@@ -184,31 +184,7 @@ def pf_localization(px, pw, z, u):
 
     N_eff = 1.0 / (pw.dot(pw.T))[0, 0]  # Effective particle number
     if N_eff < NTh:
-        # px, pw = re_sampling(px, pw)
-
-        ### My code
-        # px, pw = adaptive_resampling(quantile=0.5, err = 0.1, bsz = [0.1,0.1], sample_min=10, num_particles=100, px, pw)
-        sampler = KLDSampling(quantile=0.5, err = 0.1, bsz = [0.1], sample_min=10, num_particles=100)
-
-        # num_samples=px;
-        samples = [];
-        umean=0
-        uvar=1
-        min_samples=10
-
-        while ((px < min_samples).any()) :
-            curr_sample = [[get_sample(umean,math.sqrt(uvar))]];
-
-            samples.append(curr_sample);
-            px = px+1;
-
-            #make the sample into a 1D vector because the kld_sampling module
-            #assumes multivariate distributions.
-            #curr_sample2[0]=curr_sample;
-            # print(len(curr_sample[0]),"curr")
-            # print(len(sampler.bin_size),"bin")
-            min_samples=sampler.update(curr_sample)
-        # px, pw = re_sampling(px, pw)
+        px, pw = re_sampling(px, pw)
     return x_est, p_est, px, pw
 
 
@@ -299,7 +275,9 @@ def main():
         x_true, z, x_dr, ud = observation(x_true, x_dr, u, rf_id)
 
         x_est, PEst, px, pw = pf_localization(px, pw, z, ud)
-
+        print(x_est,"x_est")
+        print(PEst,"PEst")
+        break;
         # store data history
         h_x_est = np.hstack((h_x_est, x_est))
         h_x_dr = np.hstack((h_x_dr, x_dr))
