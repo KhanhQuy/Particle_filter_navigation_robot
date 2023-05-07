@@ -184,30 +184,29 @@ def pf_localization(px, pw, z, u):
 
     N_eff = 1.0 / (pw.dot(pw.T))[0, 0]  # Effective particle number
     if N_eff < NTh:
-        px, pw = re_sampling(px, pw)
+        # px, pw = re_sampling(px, pw)
 
         ### My code
         # px, pw = adaptive_resampling(quantile=0.5, err = 0.1, bsz = [0.1,0.1], sample_min=10, num_particles=100, px, pw)
-        # sampler = KLDSampling(quantile=0.5, err = 0.1, bsz = [0.1,0.1], sample_min=10, num_particles=100)
+        sampler = KLDSampling(quantile=0.5, err = 0.1, bsz = [0.1,0.1], sample_min=10, num_particles=100)
 
-        # # num_samples=px;
-        # samples = [];
-        # umean=0
-        # uvar=1
-        # min_samples=10
+        # num_samples=px;
+        samples = [];
+        umean=0
+        uvar=1
+        min_samples=10
 
-        # while (px < min_samples) :
-        #     curr_sample = [[get_sample(umean,math.sqrt(uvar))]];
+        while ((px < min_samples).any()) :
+            curr_sample = [[get_sample(umean,math.sqrt(uvar))]];
 
-        #     samples.append(curr_sample);
-        #     px = px+1;
+            samples.append(curr_sample);
+            px = px+1;
 
-        #     #make the sample into a 1D vector because the kld_sampling module
-        #     #assumes multivariate distributions.
-        #     #curr_sample2[0]=curr_sample;
-
-        #     min_samples=sampler.update(curr_sample)
-        # px, pw = re_sampling(px, pw)
+            #make the sample into a 1D vector because the kld_sampling module
+            #assumes multivariate distributions.
+            #curr_sample2[0]=curr_sample;
+            min_samples=sampler.update(curr_sample)
+        px, pw = re_sampling(px, pw)
     return x_est, p_est, px, pw
 
 
