@@ -197,7 +197,7 @@ def test1d(quantile=0.5, kld_error = 0.1, bin_size = 0.1, min_samples=10, seed=-
   print(bins)
   sampler= KLDSampling(quantile,kld_error,bins,min_samples, 100);
 
-  num_samples=0;
+  num_samples=100;
   samples = [];
 
   while (num_samples < min_samples) :

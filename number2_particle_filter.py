@@ -277,7 +277,6 @@ def main():
         x_est, PEst, px, pw = pf_localization(px, pw, z, ud)
         print(x_est,"x_est")
         print(PEst,"PEst")
-        break;
         # store data history
         h_x_est = np.hstack((h_x_est, x_est))
         h_x_dr = np.hstack((h_x_dr, x_dr))
