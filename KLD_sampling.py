@@ -37,7 +37,7 @@ class KLDSampling:
 #   Initialize a round of KLD sampling.  Takes in kld-parameters:
 #   quantile, kld-error, bin size, minimum number of samples
 #**/
-    def __init__(self,quantile, err, bsz, sample_min, num_particles) :
+    def __init__(self, quantile, err, bsz, sample_min, num_particles) :
 
         # Constructs Z-table (from ztable.data) to lookup statistics.
 
@@ -152,7 +152,7 @@ def get_sample(mean, std) :
         return random.gauss(mean,std)
 
 # Given ND samples, computes mean.
-def get_mean(samps) :
+def get_mean(samps):
     if isinstance(samps[0],list):
         # accumulate
         cols = [[s[i] for s in samps] for i in range(len(samps[0]))];
@@ -251,7 +251,7 @@ def test2d(quantile=0.5, kld_error = 0.1, bin_size = [0.1,0.1], min_samples=10, 
   samples = [];
   ustd = [ math.sqrt(v) for v in uvar];
 
-  while (num_samples < min_samples) :
+  while (num_samples < min_samples):
     curr_sample = [get_sample(umean,ustd)];
     samples.append(curr_sample);
     num_samples = num_samples+1;
